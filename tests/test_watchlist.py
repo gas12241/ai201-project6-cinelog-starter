@@ -36,6 +36,22 @@ def sample_user(app):
         return user.id
 
 
+@pytest.fixture
+def sample_film(app):
+    """A film to use in tests."""
+    with app.app_context():
+        film = Film(title="Paddington 2", year=2017, genre="Comedy")
+        db.session.add(film)
+        db.session.commit()
+        return film.id
+
+
+@pytest.fixture
+def client(app):
+    """A test client for hitting the watchlist routes over HTTP."""
+    return app.test_client()
+
+
 # ── Nonexistent film ─────────────────────────────────────────────────────────
 
 def test_add_to_watchlist_nonexistent_film_raises(app, sample_user):
@@ -79,3 +95,31 @@ def test_get_watchlist_returns_newest_first(app, sample_user):
         # Blade Runner was added later, so it should come first
         assert titles[0] == "Blade Runner"
         assert titles[1] == "Alien"
+
+
+# ── Route-level error handling ───────────────────────────────────────────────
+
+def test_add_film_route_duplicate_returns_409(client, sample_user, sample_film):
+    """
+    POST /watchlist/<user_id>/add should return a clean 409 (not a raw 500)
+    when the film is already on the user's watchlist.
+    """
+    client.post(f"/watchlist/{sample_user}/add", json={"film_id": sample_film})
+
+    response = client.post(f"/watchlist/{sample_user}/add", json={"film_id": sample_film})
+
+    assert response.status_code == 409
+    assert "error" in response.get_json()
+
+
+def test_add_film_route_nonexistent_film_returns_404(client, sample_user):
+    """
+    POST /watchlist/<user_id>/add should return a clean 404 (not a raw 500)
+    when film_id doesn't exist.
+    """
+    fake_film_id = "00000000-0000-0000-0000-000000000000"
+
+    response = client.post(f"/watchlist/{sample_user}/add", json={"film_id": fake_film_id})
+
+    assert response.status_code == 404
+    assert "error" in response.get_json()
