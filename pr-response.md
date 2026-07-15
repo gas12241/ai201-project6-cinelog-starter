@@ -20,6 +20,8 @@ NOTE: After writing out this section, I tried adding some of the stretch feature
 
 For the rebase section of the project, I asked claude to help with the rebase. I took note of what it did (prompting it to give me the steps it took to finish the rebase), and asked Cladue to write the rebase section of this file.
 
+The stretch feature - Remove From Watchlist - section was written using Claude. It details what went into adding the method and getting it to work as a route, its unhappy path, how it follows the codebase patterns that are already set, and how it was tested.
+
 Lastly, I asked Claude to write steps for manually testing. Then I asked Claude to run through those steps to see if they were accurate, which they were.
 
 ## Comment 1 — Rename
