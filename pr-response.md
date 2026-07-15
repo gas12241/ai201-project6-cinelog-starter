@@ -52,6 +52,8 @@ One little caveat I would add is to make it painstakingly clear to the user that
 
 **Tradeoff acknowledged:** Some people might not even think to make their watchlist public, and in that case, it could end up not bringing the community together in the way that we would want. That being said, I do believe User Privacy should be the biggest priority between the two.
 
+**How the visibility toggle works:** `add_to_watchlist(user_id, film_id, public=False)` in `services/watchlist_service.py` now takes an optional `public` keyword argument. It defaults to `False`, so any caller that doesn't specify it gets a private entry (matching the decision above). To opt an entry into being public, a caller passes `public=True` directly, e.g. `add_to_watchlist(user_id, film_id, public=True)`. Over the API, the route (`POST /watchlist/<user_id>/add`) reads this from the JSON body as an optional `"public"` field — e.g. `{"film_id": "<uuid>", "public": true}` — and falls back to `False` if the field is omitted, so existing callers that don't send it keep the private-by-default behavior.
+
 ## Comment 5 — Sort order
 
 I'd prefer watchlists to default to "date added" order rather than alphabetical. Most users want to see what they added recently. I'm open to discussion if you see it differently — but let's make a decision and document it.
