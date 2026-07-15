@@ -12,9 +12,11 @@ One thing that I've seen people do but never done myself (mostly because I've se
 
 Talking about comments, for the first 3 comments, I did ask Claude to check if I was missing anything after implementing it myself. I used it as a way of making sure I wasn't missing anything.
 
+For comments 4 and 5, Claude didn't write anything for me BUT I did ask it to counter to both of the decisions I made. That lead to some of the disucssion of the counter-arguments in the comment sections themselves. For comment 4, Claude pointed out that having the default visibility set to false for a community driven app would probably not be in its best interest, given that the site doesn't have access to a lot of personal data the way other apps or websites might, but I still thought it would be safer to err on the side of privacy (with ways of reminding the user that they can share their watchlist with others by making it public). For comment 5, two of the things Claude mentioned that I tried addressing were the personal connection I had to my answer, as well as the "stale" movies that would gather at the end/bottom of a get watchlist call. There are websites that show your watchlist in a similar fashion, which is why I wasn't too phased by the "stale" movies that were added a long time ago. That being said, my answer being a personal one didn't seem out of the question considering the reviewer had a personal touch when commenting about how the watchlist should be returned, which is why I added my personal touch to comment 5 as well.
+
 For the rebase section of the project, I asked claude to help with the rebase. I took note of what it did (prompting it to give me the steps it took to finish the rebase), and asked Cladue to write the rebase section of this file.
 
-Lastly, I asked Claude to write steps for manually testing
+Lastly, I asked Claude to write steps for manually testing. Then I asked Claude to run through those steps to see if they were accurate, which they were.
 
 ## Comment 1 — Rename
 
@@ -46,7 +48,7 @@ I notice watchlists default to public=True. We don't have a documented decision 
 **My position:** I think watchlists should default to NOT being public (public = False).
 **Reasoning:** I think it's a better bet to make the default with user privacy in mind. An example that came to mind when thinking of this is when Steam changed everything so that users had to opt into sharing things on their profile (I believe this was in response to Facebook leaking data). I think this is nice because if you're curious about the watchlists of friends, you'll end up asking them about it and bringing up the choice of whether or not they want to make it public (which will also remind the user to make theirs public as well if they so choose).In this way, people who are social will end up seeing their friends film watchlist, while those who could care less, don't have their information out in the open.
 
-One little caveat I would add is to make it painstakingly clear to the user that the toggle for private vs public watchlists exist. Relying on word of mouth solely would ba a grave mistake.
+One little caveat I would add is to make it painstakingly clear to the user that the toggle for private vs public watchlists exist. Relying on word of mouth solely would be a grave mistake.
 
 **Tradeoff acknowledged:** Some people might not even think to make their watchlist public, and in that case, it could end up not bringing the community together in the way that we would want. That being said, I do believe User Privacy should be the biggest priority between the two.
 
