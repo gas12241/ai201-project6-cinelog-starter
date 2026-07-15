@@ -63,9 +63,16 @@ The other reason you wouldn't want the most recent movies first, is that people 
 
 ## Comment 6 — Rebase
 
-**What conflicted:**
-**How I resolved it:**
-**How I verified no conflict remains:**
+**What conflicted:** I ran `git fetch origin` followed by `git rebase origin/main` to bring in main's changes, which included a refactor that migrated `Film.id` from an integer to a UUID string. Two conflicts came up:
+1. `.gitignore` — an add/add conflict. Both my branch and main independently added a `.gitignore` file, and mine had an extra `.pytest_cache/` entry that main's didn't.
+2. `models.py` — a real content conflict. My `WatchlistEntry` model (added on my branch) still defined `film_id` as `db.Integer`, but main's refactor had already changed `Film.id` and `CollectionEntry.film_id` to `db.String(36)` (UUID). Since `WatchlistEntry` only existed on my branch, git couldn't automatically know it needed the same type update.
+
+**How I resolved it:** For `.gitignore`, I kept both versions' lines so nothing was lost (`.pytest_cache/`, `.venv/`, `venv/`, etc.). For `models.py`, I kept my `WatchlistEntry` class but changed `film_id` from `db.Column(db.Integer, ...)` to `db.Column(db.String(36), ...)` so it matched the new UUID type used everywhere else. I also found two leftover docstrings/comments (in `services/watchlist_service.py` and `routes/watchlist/watchlist.py`) that still described `film_id` as an int from before the refactor, and updated those too so the documentation matched the actual UUID type.
+
+**How I verified no conflict remains:** After resolving both files and running `git rebase --continue`, the rebase finished with "Successfully rebased and updated refs/heads/feature/watchlist." I then:
+- Ran `git log --merges origin/main..HEAD` to confirm the rebase didn't introduce any merge commits (empty output — the branch history is fully linear on top of main).
+- Grepped the codebase for any remaining `db.Integer` tied to `film_id` to make sure I hadn't missed another spot — found none.
+- Ran the full test suite (`pytest`) and confirmed all 6 tests still passed after the rebase.
 
 ## PR Description
 
