@@ -6,6 +6,12 @@
 
 One of the first things we are told to do is to ask Claude for help in navigating the codebase. This included a summary of models.py, a function explanation of add_to_collection(), and asking about the test structure found in the test_collection.py tests.
 
+I used Claude to write the test_watchlist.py file as well. It was pretty similar to test_collection, so with that context, it returned a working test.
+
+One thing that I've seen people do but never done myself (mostly because I've seen it done with a keyboard shortcut), is change the name of one symbol, and have it affect all references of it. I asked Claude to tell me how you can do that in VS Code, which helped with the first comment.
+
+Talking about comments, for the first 3 comments, I did ask Claude to check if I was missing anything after implementing it myself. I used it as a way of making sure I wasn't missing anything.
+
 ## Comment 1 — Rename
 
 Rename save_to_watchlist() to add_to_watchlist() in services/watchlist_service.py and update all call sites (there is one in routes/watchlist/watchlist.py). Use your editor's find-all-references or a project-wide search to confirm you haven't missed any.
@@ -46,6 +52,8 @@ I'd prefer watchlists to default to "date added" order rather than alphabetical.
 
 **My position:** Unless I am reading this incorrectly, I agree that watchlists should be oredered by "date added" with the most recent additions being the first ones to show up.
 **Reasoning:** When I think about movies that I want to watch, if I have been reminded about it and add it to my watchlist, I usually have the itch to watch them sooner rather than later. Because of this, I think it makes the most sense to return the movies that were most recently added, first. I also think that if you return movies in order alphabetically, if you have many movies in your recommended, it might cause the watchlist to have the same or similar returnings in order over and over again if you don't add any movies that break the top X movies alphabetically.
+
+I also want to address that you could argue this is more of a personal take rather than one based on how the code works and what the project might stand for. The reviewers point for sort order was based on pesonal opinion, so I think it would be fair to use my personal opinion as well.
 
 For reasons against this sort of sort, it would be that not everyone enjoys seeing movies added most recently. I think the best case scenario would be to have something to toggle between multiple sorting styles, but I'm not sure how reasonable that is to do.
 
