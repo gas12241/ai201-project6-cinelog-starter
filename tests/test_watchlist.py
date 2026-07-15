@@ -9,7 +9,12 @@ import pytest
 from app import create_app, db
 from models import User, Film, WatchlistEntry
 from services.collection_service import FilmNotFoundError
-from services.watchlist_service import add_to_watchlist, get_watchlist
+from services.watchlist_service import (
+    add_to_watchlist,
+    remove_from_watchlist,
+    get_watchlist,
+    NotInWatchlistError,
+)
 
 
 @pytest.fixture
@@ -123,6 +128,32 @@ def test_add_to_watchlist_respects_explicit_public_flag(app, sample_user, sample
         assert watchlist[0]["public"] is True
 
 
+# ── Removal ──────────────────────────────────────────────────────────────────
+
+def test_remove_from_watchlist_removes_entry(app, sample_user, sample_film):
+    """
+    Removing a film that's on the watchlist should delete the entry and
+    return True.
+    """
+    with app.app_context():
+        add_to_watchlist(user_id=sample_user, film_id=sample_film)
+
+        result = remove_from_watchlist(user_id=sample_user, film_id=sample_film)
+
+        assert result is True
+        assert get_watchlist(sample_user) == []
+
+
+def test_remove_from_watchlist_not_on_list_raises(app, sample_user, sample_film):
+    """
+    Removing a film that isn't on the user's watchlist should raise
+    NotInWatchlistError, not silently no-op.
+    """
+    with app.app_context():
+        with pytest.raises(NotInWatchlistError):
+            remove_from_watchlist(user_id=sample_user, film_id=sample_film)
+
+
 # ── Route-level error handling ───────────────────────────────────────────────
 
 def test_add_film_route_duplicate_returns_409(client, sample_user, sample_film):
@@ -146,6 +177,17 @@ def test_add_film_route_nonexistent_film_returns_404(client, sample_user):
     fake_film_id = "00000000-0000-0000-0000-000000000000"
 
     response = client.post(f"/watchlist/{sample_user}/add", json={"film_id": fake_film_id})
+
+    assert response.status_code == 404
+    assert "error" in response.get_json()
+
+
+def test_remove_film_route_not_on_list_returns_404(client, sample_user, sample_film):
+    """
+    DELETE /watchlist/<user_id>/remove should return a clean 404 (not a raw
+    500) when the film isn't on the user's watchlist.
+    """
+    response = client.delete(f"/watchlist/{sample_user}/remove", json={"film_id": sample_film})
 
     assert response.status_code == 404
     assert "error" in response.get_json()
