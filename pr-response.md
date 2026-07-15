@@ -12,7 +12,11 @@ One thing that I've seen people do but never done myself (mostly because I've se
 
 Talking about comments, for the first 3 comments, I did ask Claude to check if I was missing anything after implementing it myself. I used it as a way of making sure I wasn't missing anything.
 
+For comment 3, the section that talks about the stretch feature (additional tests) was written by Claude. The tests were added earlier when I was testing and found out that although the service would raise the correct error, the route wasn't really handling errors at all, just breaking.
+
 For comments 4 and 5, Claude didn't write anything for me BUT I did ask it to counter to both of the decisions I made. That lead to some of the disucssion of the counter-arguments in the comment sections themselves. For comment 4, Claude pointed out that having the default visibility set to false for a community driven app would probably not be in its best interest, given that the site doesn't have access to a lot of personal data the way other apps or websites might, but I still thought it would be safer to err on the side of privacy (with ways of reminding the user that they can share their watchlist with others by making it public). For comment 5, two of the things Claude mentioned that I tried addressing were the personal connection I had to my answer, as well as the "stale" movies that would gather at the end/bottom of a get watchlist call. There are websites that show your watchlist in a similar fashion, which is why I wasn't too phased by the "stale" movies that were added a long time ago. That being said, my answer being a personal one didn't seem out of the question considering the reviewer had a personal touch when commenting about how the watchlist should be returned, which is why I added my personal touch to comment 5 as well.
+
+NOTE: After writing out this section, I tried adding some of the stretch features, there is a part of comment 4 that does include Claude generated md, which is the part talking about the visibility stretch feature.
 
 For the rebase section of the project, I asked claude to help with the rebase. I took note of what it did (prompting it to give me the steps it took to finish the rebase), and asked Cladue to write the rebase section of this file.
 
@@ -38,6 +42,8 @@ Create a new file tests/test_watchlist.py. Read tests/test_collection.py and fin
 
 **What I did:** Created a test file for watchlist, and wrote a test named `test_add_to_watchlist_nonexistent_film_raises` which was similar to `test_add_to_collection_nonexistent_film_raises` in the test_collection.py file.
 **How I verified:** I ran the test suite, first by only running the test that I just added. When that passed, I ran the whole test suite to make sure nothing broke.
+
+**Additional test beyond what was asked:** While manually testing the feature end-to-end (not just the service layer), I found that `POST /watchlist/<user_id>/add` didn't actually behave the way the existing service-level tests implied. `add_to_watchlist()` correctly raises `FilmNotFoundError` and `AlreadyInWatchlistError`, but the route itself never caught either exception, so both cases surfaced as raw `500 Internal Server Error` responses (a full debugger traceback) instead of clean `404`/`409` JSON errors. I chose this edge case specifically because the original Comment 3 test only proves the _service function_ raises the right exception — it says nothing about what an actual API caller receives over HTTP, and that's exactly where the bug was hiding. After fixing the route to catch both exceptions, I added `test_add_film_route_duplicate_returns_409` and `test_add_film_route_nonexistent_film_returns_404` (using Flask's test client to hit the real route, not just call the service function directly) to lock in the correct HTTP-level behavior so this can't silently regress again.
 
 ## Comment 4 — Default visibility
 
@@ -83,6 +89,16 @@ The other reason you wouldn't want the most recent movies first, is that people 
 - Ran `git log --merges origin/main..HEAD` to confirm the rebase didn't introduce any merge commits (empty output — the branch history is fully linear on top of main).
 - Grepped the codebase for any remaining `db.Integer` tied to `film_id` to make sure I hadn't missed another spot — found none.
 - Ran the full test suite (`pytest`) and confirmed all 6 tests still passed after the rebase.
+
+## Stretch Feature — Remove from Watchlist
+
+The watchlist had no way to remove a film once it was added — `services/collection_service.py` already has `remove_from_collection()` for the analogous case in the collection feature, but there was no equivalent for the watchlist at all. I added `remove_from_watchlist(user_id, film_id)` to `services/watchlist_service.py` and a matching `DELETE /watchlist/<user_id>/remove` route.
+
+**What it does when the film isn't on the watchlist:** it raises a new `NotInWatchlistError` rather than silently doing nothing or raising a generic database error. The route catches this and returns a clean `404` with a message like `{"error": "Film '<film_id>' is not in this user's watchlist"}`.
+
+**How it follows the project's existing patterns:** it's a near-exact mirror of `remove_from_collection()`/`NotInCollectionError` in `services/collection_service.py` and the `DELETE /collection/<user_id>/remove` route in `routes/collection.py` — same lookup-then-delete shape, same "raise a custom not-found-style error instead of a silent no-op" behavior, and the route wraps the call in the same try/except-to-HTTP-status pattern already used for `add_film`.
+
+**Tests:** I added `test_remove_from_watchlist_removes_entry` and `test_remove_from_watchlist_not_on_list_raises` (service-level), plus `test_remove_film_route_not_on_list_returns_404` (route-level, using the Flask test client) to cover both the happy path and the not-on-list edge case at both layers.
 
 ## git log Screenshot
 
