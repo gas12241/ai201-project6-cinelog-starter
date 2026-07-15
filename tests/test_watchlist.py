@@ -97,6 +97,32 @@ def test_get_watchlist_returns_newest_first(app, sample_user):
         assert titles[1] == "Alien"
 
 
+# ── Visibility toggle ────────────────────────────────────────────────────────
+
+def test_add_to_watchlist_defaults_to_private(app, sample_user, sample_film):
+    """
+    add_to_watchlist() should default a new entry to public=False when the
+    caller doesn't specify a value (per the Comment 4 decision).
+    """
+    with app.app_context():
+        entry = add_to_watchlist(user_id=sample_user, film_id=sample_film)
+
+        assert entry.public is False
+
+
+def test_add_to_watchlist_respects_explicit_public_flag(app, sample_user, sample_film):
+    """
+    A caller can opt an entry into being public by passing public=True.
+    """
+    with app.app_context():
+        entry = add_to_watchlist(user_id=sample_user, film_id=sample_film, public=True)
+
+        assert entry.public is True
+
+        watchlist = get_watchlist(sample_user)
+        assert watchlist[0]["public"] is True
+
+
 # ── Route-level error handling ───────────────────────────────────────────────
 
 def test_add_film_route_duplicate_returns_409(client, sample_user, sample_film):
