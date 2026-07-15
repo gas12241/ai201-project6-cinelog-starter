@@ -39,9 +39,11 @@ I notice watchlists default to public=True. We don't have a documented decision 
 
 ## Comment 5 — Sort order
 
-**My position:**
-**Reasoning:**
-**Engagement with reviewer's point:**
+I'd prefer watchlists to default to "date added" order rather than alphabetical. Most users want to see what they added recently. I'm open to discussion if you see it differently — but let's make a decision and document it.
+
+**My position:** Unless I am reading this incorrectly, I agree that watchlists should be oredered by "date added" with the most recent additions being the first ones to show up.
+**Reasoning:** When I think about movies that I want to watch, if I have been reminded about it and add it to my watchlist, I usually have the itch to watch them sooner rather than later. Because of this, I think it makes the most sense to return the movies that were most recently added, first. I also think that if you return movies in order alphabetically, if you have many movies in your recommended, it might cause the watchlist to have the same or similar returnings in order over and over again if you don't add any movies that break the top X movies alphabetically.
+**Engagement with reviewer's point:** I agree wholeheartedly with the reviewer. If I get reminded of a movie, and I add it to my watchlist, I would like to see it to get it out of the watchlist. Waiting too long will cause me to lose interest in the film.
 
 ## Comment 6 — Rebase
 
