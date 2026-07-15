@@ -34,7 +34,10 @@ NOTE: At the top of the HW assignment, it makes it sound like we won't have to w
 I notice watchlists default to public=True. We don't have a documented decision on default visibility for user lists. Before I can approve this, I need you to add a note to your PR description explaining your reasoning. I want to make sure we're being intentional here, not just inheriting a default.
 
 **My position:** I think watchlists should default to NOT being public (public = False).
-**Reasoning:** I think it's a better bet to make the default with user privacy in mind. An example that came to mind when thinking of this is when Steam changed everything so that users had to opt into sharing things on their profile (I believe this was in response to Facebook leaking data). I think this is nice because if you're curious about the watchlists of friends, you'll end up asking them about it and bringing up the choice of whether or not they want to make it public (which will also remind the user to make theirs public as well if they so choose). In this way, people who are social will end up seeing their friends film watchlist, while those who could care less, don't have their information out in the open.
+**Reasoning:** I think it's a better bet to make the default with user privacy in mind. An example that came to mind when thinking of this is when Steam changed everything so that users had to opt into sharing things on their profile (I believe this was in response to Facebook leaking data). I think this is nice because if you're curious about the watchlists of friends, you'll end up asking them about it and bringing up the choice of whether or not they want to make it public (which will also remind the user to make theirs public as well if they so choose).In this way, people who are social will end up seeing their friends film watchlist, while those who could care less, don't have their information out in the open.
+
+One little caveat I would add is to make it painstakingly clear to the user that the toggle for private vs public watchlists exist. Relying on word of mouth solely would ba a grave mistake.
+
 **Tradeoff acknowledged:** Some people might not even think to make their watchlist public, and in that case, it could end up not bringing the community together in the way that we would want. That being said, I do believe User Privacy should be the biggest priority between the two.
 
 ## Comment 5 — Sort order
@@ -43,6 +46,11 @@ I'd prefer watchlists to default to "date added" order rather than alphabetical.
 
 **My position:** Unless I am reading this incorrectly, I agree that watchlists should be oredered by "date added" with the most recent additions being the first ones to show up.
 **Reasoning:** When I think about movies that I want to watch, if I have been reminded about it and add it to my watchlist, I usually have the itch to watch them sooner rather than later. Because of this, I think it makes the most sense to return the movies that were most recently added, first. I also think that if you return movies in order alphabetically, if you have many movies in your recommended, it might cause the watchlist to have the same or similar returnings in order over and over again if you don't add any movies that break the top X movies alphabetically.
+
+For reasons against this sort of sort, it would be that not everyone enjoys seeing movies added most recently. I think the best case scenario would be to have something to toggle between multiple sorting styles, but I'm not sure how reasonable that is to do.
+
+The other reason you wouldn't want the most recent movies first, is that people would forget about the movies you've added a while ago, and they would continue to sink lower down the list.
+
 **Engagement with reviewer's point:** I agree wholeheartedly with the reviewer. If I get reminded of a movie, and I add it to my watchlist, I would like to see it to get it out of the watchlist. Waiting too long will cause me to lose interest in the film.
 
 ## Comment 6 — Rebase
