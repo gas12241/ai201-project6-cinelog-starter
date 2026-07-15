@@ -14,6 +14,8 @@ Talking about comments, for the first 3 comments, I did ask Claude to check if I
 
 For the rebase section of the project, I asked claude to help with the rebase. I took note of what it did (prompting it to give me the steps it took to finish the rebase), and asked Cladue to write the rebase section of this file.
 
+Lastly, I asked Claude to write steps for manually testing
+
 ## Comment 1 — Rename
 
 Rename save_to_watchlist() to add_to_watchlist() in services/watchlist_service.py and update all call sites (there is one in routes/watchlist/watchlist.py). Use your editor's find-all-references or a project-wide search to confirm you haven't missed any.
@@ -85,3 +87,93 @@ The other reason you wouldn't want the most recent movies first, is that people 
 ## PR Description
 
 <!-- Written at the end — feature overview, design decisions, manual testing steps -->
+
+Explain what the watchlist feature does:
+The watchlist feature allows a user to add movies that they haven't seen yet, but would like to, to a list.
+
+Name both design decisions you made (visibility default and sort order):
+For visibility default, I chose for watchlist visibility to NOT be public by default. I think the biggest tradeoff would be that for a community driven app, seeing what other people are planning to watch would be a huge selling point, so not having it be public by default seems counter-intuitive. That being said, I do think that it can be a selling point, that a person isn't sharing information right away, but only by their discretion. I pointed to another company that does this, Valve, and how people who want to, will willingly change their privacy settings to allow others to see their profile, but if it's not something that matters to you, you won't have to change a thing.
+
+For sort order, I agreed with the reviewer. I am a big fan of your watchlist returning things that were added most recently. The biggest issue for this is that you can have a list where you will never see what is at the bottom unless you make the conscious effort to scroll all the way down, which I do think is fair. But I think if someone adds a movie to their watchlist, they might want to watch it while it's still fresh in their mind, so this is probably the best way to go about it. That being said, I do think the best case scenario would be to create a toggle with a few options, as to satisfy as many people as possible, but I'm not sure how possible that is in this app.
+
+### Manual testing steps
+
+The app has no signup or film-creation endpoints (films are meant to be seeded, and my local `instance/cinelog.db` was empty), so testing the watchlist requires seeding a user and a couple films directly first.
+
+1. **Start the app:**
+
+   ```
+   python app.py
+   ```
+
+   This runs on `http://127.0.0.1:5000` with debug mode on.
+
+2. **Seed a test user and two films.** In a separate terminal, open a Python shell in the app context and create the rows directly:
+
+   ```
+   python3 -c "
+   from app import create_app, db
+   from models import User, Film
+
+   app = create_app()
+   with app.app_context():
+       user = User(username='testuser', email='test@example.com')
+       film_a = Film(title='Alien', year=1979, genre='Horror')
+       film_b = Film(title='Blade Runner', year=1982, genre='Sci-Fi')
+       db.session.add_all([user, film_a, film_b])
+       db.session.commit()
+       print('user_id:', user.id)
+       print('film_a_id:', film_a.id)
+       print('film_b_id:', film_b.id)
+   "
+   ```
+
+   Copy the printed UUIDs — they're used in place of `<user_id>`, `<film_a_id>`, and `<film_b_id>` below.
+
+3. **Check the watchlist starts empty:**
+
+   ```
+   curl http://127.0.0.1:5000/watchlist/<user_id>
+   ```
+
+   Expected: `[]`
+
+4. **Add the first film to the watchlist:**
+
+   ```
+   curl -X POST http://127.0.0.1:5000/watchlist/<user_id>/add \
+     -H "Content-Type: application/json" \
+     -d '{"film_id": "<film_a_id>"}'
+   ```
+
+   Expected: `201`, with the new entry's JSON — check that `"public": false` (confirming the Comment 4 default-visibility decision).
+
+5. **Add the second film, then confirm sort order (Comment 5):**
+
+   ```
+   curl -X POST http://127.0.0.1:5000/watchlist/<user_id>/add \
+     -H "Content-Type: application/json" \
+     -d '{"film_id": "<film_b_id>"}'
+
+   curl http://127.0.0.1:5000/watchlist/<user_id>
+   ```
+
+   Expected: a list of both films, with the **second film added showing up first** (newest-added-first order).
+
+6. **Try adding the same film again (dedup check, Comment 2):**
+
+   ```
+   curl -X POST http://127.0.0.1:5000/watchlist/<user_id>/add \
+     -H "Content-Type: application/json" \
+     -d '{"film_id": "<film_a_id>"}'
+   ```
+
+   Expected: a clean `409` with an error message, e.g. `{"error": "Film '<film_a_id>' is already in this user's watchlist"}`. (The route now catches `AlreadyInWatchlistError` and returns it as a proper HTTP response, matching the pattern already used in `routes/collection.py`.)
+
+7. **Try adding a film that doesn't exist:**
+   ```
+   curl -X POST http://127.0.0.1:5000/watchlist/<user_id>/add \
+     -H "Content-Type: application/json" \
+     -d '{"film_id": "00000000-0000-0000-0000-000000000000"}'
+   ```
+   Expected: a clean `404` with an error message, e.g. `{"error": "No film found with id '00000000-0000-0000-0000-000000000000'"}`. (The route now catches `FilmNotFoundError` too.)
