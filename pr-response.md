@@ -15,8 +15,10 @@ save_to_watchlist() should follow the project's naming convention. Compare with 
 
 ## Comment 2 — Deduplication
 
-**What I did:**
-**How I verified:**
+What happens if a user calls this with a film that's already on their watchlist? The current implementation would add a duplicate entry. Please handle this case.
+
+**What I did:** Added a conditional in the add_to_watchlist() method found in the watchlist_service.py file that checks if the film is one the User has already added to their watchlist.
+**How I verified:** I followed the same pattern as add_to_collection() does, including adding a custom Exception class to the file. I did double check using Claude to see if the code works the same.
 
 ## Comment 3 — Missing test
 
