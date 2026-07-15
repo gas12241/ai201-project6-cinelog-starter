@@ -29,9 +29,13 @@ Create a new file tests/test_watchlist.py. Read tests/test_collection.py and fin
 
 ## Comment 4 — Default visibility
 
-**My position:**
-**Reasoning:**
-**Tradeoff acknowledged:**
+NOTE: At the top of the HW assignment, it makes it sound like we won't have to write code for the decision comments. Under Milestone 3, it says: "Comments 4 and 5 aren't code problems — they're design conversations. Both require written arguments, not just code." This makes it sound like I have to do both, so I made a decision AND changed code to make public = False by default.
+
+I notice watchlists default to public=True. We don't have a documented decision on default visibility for user lists. Before I can approve this, I need you to add a note to your PR description explaining your reasoning. I want to make sure we're being intentional here, not just inheriting a default.
+
+**My position:** I think watchlists should default to NOT being public (public = False).
+**Reasoning:** I think it's a better bet to make the default with user privacy in mind. An example that came to mind when thinking of this is when Steam changed everything so that users had to opt into sharing things on their profile (I believe this was in response to Facebook leaking data). I think this is nice because if you're curious about the watchlists of friends, you'll end up asking them about it and bringing up the choice of whether or not they want to make it public (which will also remind the user to make theirs public as well if they so choose). In this way, people who are social will end up seeing their friends film watchlist, while those who could care less, don't have their information out in the open.
+**Tradeoff acknowledged:** Some people might not even think to make their watchlist public, and in that case, it could end up not bringing the community together in the way that we would want. That being said, I do believe User Privacy should be the biggest priority between the two.
 
 ## Comment 5 — Sort order
 
